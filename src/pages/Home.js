@@ -16,7 +16,7 @@ const home = (props) => {
         font-size: .875rem;
         text-align: center;
         @media screen and (min-width: 768px) {
-            margin-top: 18rem;
+            margin-top: 16rem;
         }
     `;
 
@@ -36,7 +36,7 @@ const home = (props) => {
         <>
         <Logo margin="4rem" />
         <Headline>What's on your mind?</Headline>
-        <SearchBar placeholder="Search" />
+        <SearchBar placeholder="Search" position="center" setting="home" />
         <SubHeadline>About This App</SubHeadline>
         <Description>
           No thumbnails. No recommendations.<br/>

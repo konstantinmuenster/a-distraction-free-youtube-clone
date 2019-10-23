@@ -17,7 +17,7 @@ const search = (props) => {
     `;
     return(
         <>
-        <SearchBar results />
+        <SearchBar results position="left" />
         <SearchResults>
             <Card />
             <Card />

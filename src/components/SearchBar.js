@@ -8,7 +8,7 @@ class SearchBar extends Component {
             margin: 2rem auto;
             @media screen and (min-width: 768px) {
                 max-width: 31.25rem;
-                margin: 4rem 0;
+                margin: 4rem ${this.props.position === "center" ? "auto" : "0"};
             }
         `;
 
@@ -35,9 +35,9 @@ class SearchBar extends Component {
             margin-left: -3.5rem;
             background: none;
             background-image: url(${
-                this.props.home ? require("../assets/magnifying-glass.svg") : require("../assets/close.svg")});
+                this.props.setting === "home" ? require("../assets/magnifying-glass.svg") : require("../assets/close.svg")});
             background-repeat: no-repeat;
-            background-position: ${this.props.home ? "center center" : "right center"}
+            background-position: ${this.props.setting === "home" ? "center center" : "right center"}
             border: none;
             outline: none;
             &:hover {
@@ -61,7 +61,7 @@ class SearchBar extends Component {
                         type="text"
                         name="search"
                         placeholder={this.props.placeholder} 
-                        value="History of the UK" />
+                        value="" />
                     {!(this.props.results) 
                         ? <Button
                             id="submit"
