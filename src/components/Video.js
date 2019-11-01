@@ -1,31 +1,27 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const video = (props) => {
-    const Video = styled.div`
-        background: rgba(0,0,0,.5);
-        width: 100%;
-        height: auto;
-        min-height: 13.125rem;
+const Video = styled.div`
+    position: relative;
+    height: 0;
+    overflow: hidden;
+    padding-bottom: 56.25%;
+    margin-top: 2rem;
+    & iframe, & object, & embed {
         position: absolute;
-        top: 6rem;
+        top: 0;
         left: 0;
-        @media screen and (min-width: 768px) {
-            position: static;
-            margin: 1rem auto;
-            max-width: 38rem;
-            min-height: 20.68rem;
-        }
-        @media screen and (min-width: 1200px) {
-            position: static;
-            margin: 1rem auto;
-            max-width: 73.5rem;
-            min-height: 40rem;
-        }
-    `;
-    return(
-        <Video />
-    );
-}
+        width: 100%;
+        height: 100%;
+    }
+`;
+
+const EMBED_URL = 'https://www.youtube.com/embed/';
+
+const video = (props) => (
+    <Video>
+        <iframe title={props.videoId} src={EMBED_URL + props.videoId} allowFullScreen autoPlay />
+    </Video>
+);
 
 export default video;

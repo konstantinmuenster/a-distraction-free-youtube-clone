@@ -1,77 +1,122 @@
-import React, { Component }  from 'react';
+import React, { useState }  from 'react';
 import styled from 'styled-components';
+import { withRouter } from 'react-router-dom';
+import  queryString  from 'query-string';
+import { connect } from 'react-redux';
+import * as actionTypes from '../store/actions';
 
-class SearchBar extends Component {
-
-    render() {
-        const Wrapper = styled.div`
-            margin: 2rem auto;
-            @media screen and (min-width: 768px) {
-                max-width: 31.25rem;
-                margin: 4rem ${this.props.position === "center" ? "auto" : "0"};
-            }
-        `;
-
-        const SearchBar = styled.div`
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-        `;
-
-        const Input = styled.input`
-            width: 100%;
-            background: ${this.props.results ? "none" : "#f5f5f5"};
-            height: 2.8rem;
-            outline: none;
-            border: none;
-            border-bottom: ${this.props.results ? "2px solid #464646" : "0"};
-            border-radius: ${this.props.results ? "0" : "1.625rem"};
-            padding: ${this.props.results ? "0 3.5rem 0 0" : "0 3.5rem 0 1.5rem"};
-        `;
-
-        const Button = styled.button`
-            width: 3.5rem;
-            height: 2.8rem;
-            margin-left: -3.5rem;
-            background: none;
-            background-image: url(${
-                this.props.setting === "home" ? require("../assets/magnifying-glass.svg") : require("../assets/close.svg")});
-            background-repeat: no-repeat;
-            background-position: ${this.props.setting === "home" ? "center center" : "right center"}
-            border: none;
-            outline: none;
-            &:hover {
-                cursor: pointer;
-            }
-        `;
-        
-        const Title = styled.h2`
-            font-size: .625rem;
-            font-weight: 400;
-            text-transform: uppercase;
-            letter-spacing: +1.3px;
-        `;
-
-        return(
-            <Wrapper>
-                {(this.props.results) ? <Title>Search Results for</Title> : null}
-                <SearchBar>
-                    <Input
-                        id="search"
-                        type="text"
-                        name="search"
-                        placeholder={this.props.placeholder} 
-                        value="" />
-                    {!(this.props.results) 
-                        ? <Button
-                            id="submit"
-                            type="submit"
-                            name="submit" />
-                        : null}
-                </SearchBar>
-            </Wrapper>
-        );
+const Wrapper = styled.div`
+    margin: 2rem auto;
+    @media screen and (min-width: 768px) {
+        max-width: 31.25rem;
+        margin: 4rem ${props => props.position === "center" ? "auto" : "0"};
     }
+`;
+
+const Bar = styled.div`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+`;
+
+const Input = styled.input`
+    width: 100%;
+    background: ${props => props.results ? "none" : "#f5f5f5"};
+    height: 2.8rem;
+    outline: none;
+    border: none;
+    border-bottom: ${props => props.results ? "2px solid #464646" : "0"};
+    border-radius: ${props => props.results ? "0" : "1.625rem"};
+    padding: ${props => props.results ? "0 3.5rem 0 0" : "0 3.5rem 0 1.5rem"};
+`;
+
+const Button = styled.button`
+    width: 3.5rem;
+    height: 2.8rem;
+    margin-left: -3.5rem;
+    background: none;
+    background-image: url(${
+        props => props.url === "/" ? require("../assets/magnifying-glass.svg") : require("../assets/close.svg")});
+    background-repeat: no-repeat;
+    background-position: center center;
+    border: none;
+    outline: none;
+    &:hover {
+        cursor: pointer;
+    }
+`;
+
+const Title = styled.h2`
+    font-size: .625rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: +1.3px;
+    margin-bottom: 1rem;
+`;
+
+const SearchBar = (props) => {
+
+    // Parse query from URL (if given)
+    const initialQuery = (props.location.search) ? queryString.parse(props.location.search).q : "";
+
+    // store query in local state
+    const [query, setQuery ] = useState(initialQuery);
+
+    // submitting a search query redirects to query-specific search results page
+    const submitSearch = (q) => {
+        props.history.push({
+            pathname: '/search',
+            search: '?q=' + q
+        });
+    }
+
+    // button click should perform different actions respectively - based on whether the user is on the home page or not
+    const handleButtonClick = (urlPath) => {
+        if (urlPath === "/") {
+            props.resetSearchResultsCount();
+            submitSearch(query);
+        } else {
+            setQuery("");
+        }
+    }
+
+    const handleKeyPress = (key) => {
+        if (key === "Enter") {
+            props.resetSearchResultsCount();
+            submitSearch(query);
+        }
+    }
+
+    return(
+        <Wrapper position={props.position}>
+            {(props.location.pathname === "/search") ? <Title>Search Results for</Title> : null}
+            <Bar>
+                <Input
+                    id="search"
+                    type="text"
+                    name="search"
+                    placeholder="Search"
+                    value={query}
+                    onChange={e => setQuery(e.target.value)}
+                    onKeyPress={(e) => handleKeyPress(e.key)} 
+                    results={props.results} />
+                {(props.location.pathname === "/" || (props.location.pathname === "/search" && query !== "")) 
+                    ? <Button
+                        id="submit"
+                        type="submit"
+                        name="submit" 
+                        url={props.location.pathname}
+                        onClick={() => handleButtonClick(props.location.pathname)} />
+                    : null}
+            </Bar>
+        </Wrapper>
+    );
 }
 
-export default SearchBar;
+const mapDispatchToProps = dispatch => {
+    return {
+        resetSearchResultsCount: () => dispatch({ type: actionTypes.RESET_SEARCH_RESULTS_COUNT })
+    }
+} 
+
+export default connect(null, mapDispatchToProps)(withRouter(SearchBar));

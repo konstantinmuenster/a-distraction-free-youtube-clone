@@ -4,39 +4,40 @@ import styled from 'styled-components';
 import Logo from '../components/Logo';
 import SearchBar from '../components/SearchBar';
 
+const Headline = styled.h2`
+    margin: 7rem auto 1.75rem;
+    text-align: center;
+    font-size: 1.125rem;
+`;
+
+const SubHeadline = styled.h3`
+    margin-top: 10rem;
+    font-size: .875rem;
+    text-align: center;
+    @media screen and (min-width: 768px) {
+        margin-top: 16rem;
+    }
+`;
+
+const Description = styled.p`
+    font-size: .875rem;
+    text-align: center;
+    line-height: 1.75;
+`;
+
+const PoweredByNotice = styled.p`
+    margin-top: 3.5rem;
+    font-size: .75rem;
+    text-align: center;
+`;
+
 const home = (props) => {
-    const Headline = styled.h2`
-        margin: 7rem auto 1.75rem;
-        text-align: center;
-        font-size: 1.125rem;
-    `;
-
-    const SubHeadline = styled.h3`
-        margin-top: 10rem;
-        font-size: .875rem;
-        text-align: center;
-        @media screen and (min-width: 768px) {
-            margin-top: 16rem;
-        }
-    `;
-
-    const Description = styled.p`
-        font-size: .875rem;
-        text-align: center;
-        line-height: 1.75;
-    `;
-
-    const PoweredByNotice = styled.p`
-        margin-top: 3.5rem;
-        font-size: .75rem;
-        text-align: center;
-    `;
 
     return(
         <>
         <Logo margin="4rem" />
         <Headline>What's on your mind?</Headline>
-        <SearchBar placeholder="Search" position="center" setting="home" />
+        <SearchBar position="center" />
         <SubHeadline>About This App</SubHeadline>
         <Description>
           No thumbnails. No recommendations.<br/>
