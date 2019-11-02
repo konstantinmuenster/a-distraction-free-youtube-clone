@@ -9,6 +9,10 @@ const Title = styled.h1`
 const Details = styled.div`
     font-size: .75rem;
     line-height: 1.75;
+    a {
+        text-decoration: none;
+        color: black;
+    }
 `;
 
 const videoDetails = (props) => {
@@ -16,7 +20,9 @@ const videoDetails = (props) => {
     return(
         <div>
         <Title>{props.title}</Title>
-        <Details>by {props.channel} – <TimeAgo date={props.publishedAt} /><br />{formattedViewCount} Views</Details>
+        <Details>
+            by <span onClick={() => props.handleChannelClick(props.channelId)}>{props.channel}</span> – 
+            <TimeAgo date={props.publishedAt} /><br />{formattedViewCount} Views</Details>
         </div>
     );
 };

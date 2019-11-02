@@ -5,6 +5,9 @@ import { withRouter } from 'react-router-dom';
 import { Content } from './Layout';
 
 const Wrapper = styled.header`
+    position: sticky;
+    top: 0;
+    z-index: 100;
     background: red;
     height: 3.75rem;
     display: flex;

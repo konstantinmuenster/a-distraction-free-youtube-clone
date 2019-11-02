@@ -57,7 +57,8 @@ const Title = styled.h2`
 const SearchBar = (props) => {
 
     // Parse query from URL (if given)
-    const initialQuery = (props.location.search) ? queryString.parse(props.location.search).q : "";
+    const params = queryString.parse(props.location.search);
+    const initialQuery = (params.q) ? params.q : "";
 
     // store query in local state
     const [query, setQuery ] = useState(initialQuery);
@@ -74,6 +75,7 @@ const SearchBar = (props) => {
     const handleButtonClick = (urlPath) => {
         if (urlPath === "/") {
             props.resetSearchResultsCount();
+            props.resetSearchResults();
             submitSearch(query);
         } else {
             setQuery("");
@@ -83,6 +85,7 @@ const SearchBar = (props) => {
     const handleKeyPress = (key) => {
         if (key === "Enter") {
             props.resetSearchResultsCount();
+            props.resetSearchResults();
             submitSearch(query);
         }
     }
@@ -115,7 +118,8 @@ const SearchBar = (props) => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        resetSearchResultsCount: () => dispatch({ type: actionTypes.RESET_SEARCH_RESULTS_COUNT })
+        resetSearchResultsCount: () => dispatch({ type: actionTypes.RESET_SEARCH_RESULTS_COUNT }),
+        resetSearchResults: () => dispatch({ type: actionTypes.RESET_SEARCH_RESULTS })
     }
 } 
 

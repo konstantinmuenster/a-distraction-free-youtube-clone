@@ -7,6 +7,7 @@ import * as actionTypes from '../store/actions';
 
 import SearchBar from '../components/SearchBar';
 import Card from '../components/Card';
+import { CardSkeleton } from '../components/Skeletons';
 import axios from '../axios';
 
 const SearchResults = styled.div`
@@ -46,34 +47,49 @@ const LoadMore = styled.button`
 
 const Search = (props) => {
 
-    // Parse query from URL
-    const query = (props.location.search) ? queryString.parse(props.location.search).q : "";
+    // Parse query or channel id from URL
+    const params = queryString.parse(props.location.search);
+    const searchQuery = params.q;
+    const channelId = params.channelId;
 
     // Deconstruct props to pass them separately as an useEffect dependency
     const saveSearchResults = props.saveSearchResults;
     const searchResultsCount = props.searchResultsCount;
 
-    // On every component mount and update: Check if search query has changed and if so, update search results
+    // On every component mount and update: Check if search query or channel id has changed and if so, update search results
     useEffect(() => {
-        const searchApi = `/search?part=snippet&videoEmbeddable=true&order=relevance&type=video&maxResults=${searchResultsCount}&q=${query}&key=${process.env.REACT_APP_API_KEY}`;
-        let videoApi = `/videos?part=snippet%2CcontentDetails%2Cstatistics&key=${process.env.REACT_APP_API_KEY}`;
-        
-        axios.get(searchApi)
+
+        // Build search api for parsed search queries or channel ids respectively
+        let SEARCH_API;
+        if (channelId) {
+            SEARCH_API = `/search?part=snippet&videoEmbeddable=true&order=relevance&type=video&maxResults=${searchResultsCount}&channelId=${channelId}&key=${process.env.REACT_APP_API_KEY}`;
+        } else if (searchQuery) {
+            SEARCH_API = `/search?part=snippet&videoEmbeddable=true&order=relevance&type=video&maxResults=${searchResultsCount}&q=${searchQuery}&key=${process.env.REACT_APP_API_KEY}`;
+        }
+
+        // Plain video api without list of video ids
+        let VIDEO_API = `/videos?part=snippet%2CcontentDetails%2Cstatistics&key=${process.env.REACT_APP_API_KEY}`;
+
+        axios.get(SEARCH_API)
              .then(res => res.data.items)
              .then(items => {
+                 // Fetch further video details for each video of the search results
                  const videoIds = items.map(item => item.id.videoId);
-                 videoApi += '&id=' + videoIds.join('%2C');
-                 axios.get(videoApi)
+                 VIDEO_API += '&id=' + videoIds.join('%2C');
+                 axios.get(VIDEO_API)
                       .then(res => res.data.items)
-                      .then(videos => saveSearchResults(videos))
+                      // save videos to store (setTimeout to showcase skeleton loading)
+                      .then(videos => setTimeout(() => saveSearchResults(videos), 1000))
                       .catch(error => console.log(error));
              })
              .catch(error => console.log(error));
 
-    }, [query, saveSearchResults, searchResultsCount]);
+    }, [searchQuery, channelId, saveSearchResults, searchResultsCount]);
 
+    // If user clicks on card, redirect to the associated video
     const handleClickOnVideo = videoId => props.history.push({ pathname: '/watch', search: '?id=' + videoId });
 
+    // Build array of cards based on search results
     const cards = props.searchResults.map(item => <Card
         key={item.id}
         videoId={item.id}
@@ -83,11 +99,14 @@ const Search = (props) => {
         viewCount={item.statistics.viewCount} 
         clicked={() => handleClickOnVideo(item.id)} />);
 
+    // Build array of skeleton loading rectangles, based on searchResultsCount and actual searchResults in the store
+    const cardsSkeleton = Array(props.searchResultsCount - cards.length).fill().map((item, index) => <CardSkeleton key={index} />);
+
     return(
         <>
         <SearchBar position="left" />
         <SearchResults>
-            {cards.length !== 0 ? cards : <p>Loading...</p>}
+            {cards.length === props.searchResultsCount ? cards : cards.concat(cardsSkeleton)}
         </SearchResults>
         <LoadMore onClick={() => props.increaseSearchResultsCount()}>Load More</LoadMore>
         </>

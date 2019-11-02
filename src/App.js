@@ -11,6 +11,7 @@ import Footer from './components/Footer';
 import Home from './pages/Home';
 import Search from './pages/Search';
 import Watch from './pages/Watch';
+import NotFound from './pages/NotFound';
 
 const store = createStore(
   reducer, 
@@ -26,6 +27,7 @@ const App = () => (
             <Route exact path="/" component={Home} />
             <Route path="/search" component={Search} />
             <Route path="/watch" component={Watch} />
+            <Route component={NotFound} />
           </Switch>
         </Content>
         <Footer />

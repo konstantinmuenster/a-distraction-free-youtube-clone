@@ -26,6 +26,12 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 searchResultsCount: 12
             }
+        
+        case actionTypes.RESET_SEARCH_RESULTS:
+            return {
+                ...state,
+                searchResults: []
+            }
 
         default:
             return state;
